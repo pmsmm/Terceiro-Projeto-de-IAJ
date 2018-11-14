@@ -25,7 +25,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
         public DepthLimitedGOAPDecisionMaking(CurrentStateWorldModel currentStateWorldModel, List<Action> actions, List<Goal> goals)
         {
-            this.ActionCombinationsProcessedPerFrame = 200;
+            this.ActionCombinationsProcessedPerFrame = 300;
             this.Goals = goals;
             this.InitialWorldModel = currentStateWorldModel;
             //this.actions = actions;

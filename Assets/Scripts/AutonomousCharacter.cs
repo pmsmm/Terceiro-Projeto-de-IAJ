@@ -339,14 +339,16 @@ namespace Assets.Scripts
 					}
 
 					previousPosition = this.startPosition;
-					foreach (var pathPosition in this.currentSmoothedSolution.PathPositions)
-					{
-						Debug.DrawLine(previousPosition, pathPosition, Color.green);
-						previousPosition = pathPosition;
-					}
+
+                    if (this.currentSmoothedSolution != null)
+                    {
+                        foreach (var pathPosition in this.currentSmoothedSolution.PathPositions)
+                        {
+                            Debug.DrawLine(previousPosition, pathPosition, Color.green);
+                            previousPosition = pathPosition;
+                        }
+                    }
 				}
-
-
 			}
 		}
     }

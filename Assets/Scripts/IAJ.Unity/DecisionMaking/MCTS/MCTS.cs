@@ -18,7 +18,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public MCTSNode BestFirstChild { get; set; }
         public List<GOB.Action> BestActionSequence { get; private set; }
 
-
         private int CurrentIterations { get; set; }
         private int CurrentIterationsInFrame { get; set; }
         private int CurrentDepth { get; set; }
@@ -60,58 +59,110 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         public GOB.Action Run()
         {
-            MCTSNode selectedNode;
+            MCTSNode selectedNode = new MCTSNode(this.CurrentStateWorldModel.GenerateChildWorldModel());
             Reward reward;
 
             var startTime = Time.realtimeSinceStartup;
             this.CurrentIterationsInFrame = 0;
 
-            //TODO: implement
-            throw new NotImplementedException();
+            while (this.CurrentIterationsInFrame < this.MaxIterationsProcessedPerFrame)
+            {
+                MCTSNode newNode = Selection(selectedNode);
+                reward = Playout(newNode.State);
+                Backpropagate(newNode, reward);
+                this.CurrentIterationsInFrame++;
+            }
+
+            return BestUCTChild(selectedNode).Action;
         }
 
         private MCTSNode Selection(MCTSNode initialNode)
         {
-            GOB.Action nextAction;
             MCTSNode currentNode = initialNode;
-            MCTSNode bestChild;
+            GOB.Action nextAction = currentNode.State.GetNextAction();
 
-
-            //TODO: implement
-            throw new NotImplementedException();
+            while (!currentNode.State.IsTerminal())
+            {
+                if (nextAction != null) return Expand(currentNode, nextAction);
+                else currentNode = BestChild(currentNode);
+            }
+            return currentNode;
         }
 
         private Reward Playout(WorldModel initialPlayoutState)
         {
-            //TODO: implement
-            throw new NotImplementedException();
+            Reward reward = new Reward();
+            while (initialPlayoutState.IsTerminal())
+            {
+                GOB.Action[] possibleActions = initialPlayoutState.GetExecutableActions();
+                GOB.Action chosenAction = possibleActions[RandomGenerator.Next(0, possibleActions.Length - 1)];
+                chosenAction.ApplyActionEffects(initialPlayoutState);
+                reward.Value = initialPlayoutState.GetScore();
+                reward.PlayerID = 0;
+            }
+            return reward;
         }
 
         private void Backpropagate(MCTSNode node, Reward reward)
         {
-            //TODO: implement
-            throw new NotImplementedException();
+            while (node != null)
+            {
+                node.N += 1;
+                if (node.Parent != null)
+                {
+                    if (node.Parent.PlayerID == reward.PlayerID) node.Q += reward.Value;
+                    else node.Q -= reward.Value;
+                }
+                node = node.Parent;
+            }
         }
 
         private MCTSNode Expand(MCTSNode parent, GOB.Action action)
         {
-            //TODO: implement
-            throw new NotImplementedException();
+            action.ApplyActionEffects(parent.State);
+            MCTSNode newNode = new MCTSNode(parent.State);
+            newNode.Parent = parent;
+            newNode.Q = 0;
+            newNode.N = 0;
+            parent.ChildNodes.Add(newNode);
+            return newNode;
         }
 
         //gets the best child of a node, using the UCT formula
         private MCTSNode BestUCTChild(MCTSNode node)
         {
-            //TODO: implement
-            throw new NotImplementedException();
+            //TODO: Pick best based on heuristics (visitado mais vezes)
+            MCTSNode bestChild = node.ChildNodes[0];
+            float bestReward = bestChild.Q / bestChild.N;
+            for (int i = 1; i < node.ChildNodes.Count; i++)
+            {
+                float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N;
+                if (newReward > bestReward)
+                {
+                    bestChild = node.ChildNodes[i];
+                    bestReward = newReward;
+                }
+            }
+            return bestChild;
         }
 
         //this method is very similar to the bestUCTChild, but it is used to return the final action of the MCTS search, and so we do not care about
         //the exploration factor
         private MCTSNode BestChild(MCTSNode node)
         {
-            //TODO: implement
-            throw new NotImplementedException();
+            MCTSNode bestChild = node.ChildNodes[0];
+            float bestReward = bestChild.Q / bestChild.N;
+            for (int i = 1; i < node.ChildNodes.Count; i++)
+            {
+                //TODO: Improve
+                float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N;
+                if (newReward > bestReward)
+                {
+                    bestChild = node.ChildNodes[i];
+                    bestReward = newReward;
+                }
+            }
+            return bestChild;
         }
     }
 }
