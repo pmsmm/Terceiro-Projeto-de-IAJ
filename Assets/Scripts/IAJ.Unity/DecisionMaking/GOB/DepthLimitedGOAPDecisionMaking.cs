@@ -28,7 +28,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
             this.ActionCombinationsProcessedPerFrame = 300;
             this.Goals = goals;
             this.InitialWorldModel = currentStateWorldModel;
-            //this.actions = actions;
         }
 
         public void InitializeDecisionMakingProcess()

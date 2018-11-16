@@ -73,6 +73,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 this.CurrentIterationsInFrame++;
             }
 
+            this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
+
             return BestUCTChild(selectedNode).Action;
         }
 
@@ -95,7 +97,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             while (initialPlayoutState.IsTerminal())
             {
                 GOB.Action[] possibleActions = initialPlayoutState.GetExecutableActions();
-                GOB.Action chosenAction = possibleActions[RandomGenerator.Next(0, possibleActions.Length - 1)];
+
+                //TODO: Verify
+                if (possibleActions.Length == 0) return reward;
+
+                int actionIndex = this.RandomGenerator.Next(0, possibleActions.Length);
+                GOB.Action chosenAction = possibleActions[actionIndex];
                 chosenAction.ApplyActionEffects(initialPlayoutState);
                 reward.Value = initialPlayoutState.GetScore();
                 reward.PlayerID = 0;
@@ -124,6 +131,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             newNode.Parent = parent;
             newNode.Q = 0;
             newNode.N = 0;
+            newNode.Action = action;
             parent.ChildNodes.Add(newNode);
             return newNode;
         }
