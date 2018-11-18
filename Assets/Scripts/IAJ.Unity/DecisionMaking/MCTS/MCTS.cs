@@ -111,12 +111,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private Reward Playout(WorldModel initialPlayoutState)
         {
             Reward reward = new Reward();
-            while (initialPlayoutState.IsTerminal())
+            while (!initialPlayoutState.IsTerminal())
             {
                 GOB.Action[] possibleActions = initialPlayoutState.GetExecutableActions();
-
-                //TODO: Verify
-                if (possibleActions.Length == 0) return reward;
 
                 int actionIndex = this.RandomGenerator.Next(0, possibleActions.Length);
                 GOB.Action chosenAction = possibleActions[actionIndex];

@@ -52,6 +52,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
             while (this.CurrentDepth >= 0)
             {
+                if (processedActions >= this.ActionCombinationsProcessedPerFrame) break;
+
                 if (this.CurrentDepth >= MAX_DEPTH)
                 {
                     float CurrentValue = this.Models[this.CurrentDepth].CalculateDiscontentment(this.Goals);
