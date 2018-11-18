@@ -6,6 +6,14 @@ using UnityEngine;
 
 namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
+    public enum BestStrategy
+    {
+        Max,
+        Robust,
+        MaxRobust,
+        Secure
+    };
+
     public class MCTS
     {
         public const float C = 1.4f;
@@ -21,6 +29,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private int CurrentIterations { get; set; }
         private int CurrentIterationsInFrame { get; set; }
         private int CurrentDepth { get; set; }
+        private readonly float ExplorationFactor = (float)Math.Sqrt(2);
+        private readonly BestStrategy strategy = BestStrategy.MaxRobust;
 
         private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
         private MCTSNode InitialNode { get; set; }
@@ -32,8 +42,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 100;
-            this.MaxIterationsProcessedPerFrame = 10;
+            this.MaxIterations = 500;
+            this.MaxIterationsProcessedPerFrame = 20;
             this.RandomGenerator = new System.Random();
         }
 
@@ -74,8 +84,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             }
 
             this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
+            this.InProgress = false;
 
-            return BestUCTChild(selectedNode).Action;
+            MCTSNode best = BestChild(selectedNode);
+            return (best != null ? best.Action : null);
         }
 
         private MCTSNode Selection(MCTSNode initialNode)
@@ -86,7 +98,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             while (!currentNode.State.IsTerminal())
             {
                 if (nextAction != null) return Expand(currentNode, nextAction);
-                else currentNode = BestChild(currentNode);
+                else
+                {
+                    MCTSNode newNode = BestUCTChild(currentNode);
+                    if (newNode != null) currentNode = newNode;
+                    else return currentNode;
+                }
             }
             return currentNode;
         }
@@ -139,12 +156,29 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         //gets the best child of a node, using the UCT formula
         private MCTSNode BestUCTChild(MCTSNode node)
         {
-            //TODO: Pick best based on heuristics (visitado mais vezes)
+            if (node.ChildNodes.Count == 0) return null;
+
             MCTSNode bestChild = node.ChildNodes[0];
             float bestReward = bestChild.Q / bestChild.N;
             for (int i = 1; i < node.ChildNodes.Count; i++)
             {
-                float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N;
+                float newReward = 0;
+                switch (strategy)
+                {
+                    case BestStrategy.Max:
+                        newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N;
+                        break;
+                    case BestStrategy.Robust:
+                        newReward = node.ChildNodes[i].N;
+                        break;
+                    case BestStrategy.MaxRobust:
+                        newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + node.ChildNodes[i].N;
+                        break;
+                    case BestStrategy.Secure:
+                        //TODO !!
+                        //newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N - A / Matf.Sqrt(node.ChildNodes[i].N);
+                        break;
+                }
                 if (newReward > bestReward)
                 {
                     bestChild = node.ChildNodes[i];
@@ -158,11 +192,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         //the exploration factor
         private MCTSNode BestChild(MCTSNode node)
         {
+            if (node.ChildNodes.Count == 0) return null;
+
             MCTSNode bestChild = node.ChildNodes[0];
             float bestReward = bestChild.Q / bestChild.N;
             for (int i = 1; i < node.ChildNodes.Count; i++)
             {
-                //TODO: Improve
+                //TODO: Pick best based on heuristics (visitado mais vezes)
                 float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N;
                 if (newReward > bestReward)
                 {
