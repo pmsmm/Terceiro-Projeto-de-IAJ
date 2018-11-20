@@ -159,23 +159,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             float bestReward = bestChild.Q / bestChild.N;
             for (int i = 1; i < node.ChildNodes.Count; i++)
             {
-                float newReward = 0;
-                switch (strategy)
-                {
-                    case BestStrategy.Max:
-                        newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N;
-                        break;
-                    case BestStrategy.Robust:
-                        newReward = node.ChildNodes[i].N;
-                        break;
-                    case BestStrategy.MaxRobust:
-                        newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + node.ChildNodes[i].N;
-                        break;
-                    case BestStrategy.Secure:
-                        //TODO !!
-                        //newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N - A / Matf.Sqrt(node.ChildNodes[i].N);
-                        break;
-                }
+                float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + ExplorationFactor * ((float)Math.Log10(node.Parent.N) / node.N);
                 if (newReward > bestReward)
                 {
                     bestChild = node.ChildNodes[i];
@@ -195,8 +179,23 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             float bestReward = bestChild.Q / bestChild.N;
             for (int i = 1; i < node.ChildNodes.Count; i++)
             {
-                //TODO: Pick best based on heuristics (visitado mais vezes)
-                float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N;
+                float newReward = 0;
+                switch (strategy)
+                {
+                    case BestStrategy.Max:
+                        newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N;
+                        break;
+                    case BestStrategy.Robust:
+                        newReward = node.ChildNodes[i].N;
+                        break;
+                    case BestStrategy.MaxRobust:
+                        newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + node.ChildNodes[i].N;
+                        break;
+                    case BestStrategy.Secure:
+                        //TODO !!
+                        //newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N - A / Mathf.Sqrt(node.ChildNodes[i].N);
+                        break;
+                }
                 if (newReward > bestReward)
                 {
                     bestChild = node.ChildNodes[i];
