@@ -165,6 +165,31 @@ namespace Assets.Scripts.GameManager
             }
         }
 
+        public void LayOnHands()
+        {
+            if (this.characterData.Mana >= 7 && this.characterData.Level >= 2 && this.characterData.HP < this.characterData.MaxHP)
+            {
+                this.characterData.HP = this.characterData.MaxHP;
+                this.characterData.Mana -= 7;
+                this.WorldChanged = true;
+            }
+        }
+
+        public void DivineWrath()
+        {
+            if (this.characterData.Mana >= 10 && this.characterData.Level >= 3 && enemies.Count > 0)
+            {
+                this.characterData.Mana -= 10;
+                foreach (GameObject enemy in enemies)
+                {
+                    enemy.SetActive(false);
+                    GameObject.Destroy(enemy);
+                }
+                enemies.Clear();
+                this.WorldChanged = true;
+            }
+        }
+
         public void Fireball(GameObject enemy)
         {
             if (enemy != null && enemy.activeSelf && InFireballRange(enemy) && this.characterData.Mana >= 5)
