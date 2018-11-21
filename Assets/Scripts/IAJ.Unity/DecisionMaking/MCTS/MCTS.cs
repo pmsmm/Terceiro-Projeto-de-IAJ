@@ -19,6 +19,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         public const float C = 1.4f;
         public bool InProgress { get; private set; }
         public int MaxIterations { get; set; }
+        public int PlayoutIterations { get; set; }
         public int MaxIterationsProcessedPerFrame { get; set; }
         public int MaxPlayoutDepthReached { get; private set; }
         public int MaxSelectionDepthReached { get; private set; }
@@ -29,7 +30,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private int CurrentIterations { get; set; }
         private int CurrentIterationsInFrame { get; set; }
         private int CurrentDepth { get; set; }
-        private readonly float ExplorationFactor = (float)Math.Sqrt(2);
         private readonly BestStrategy strategy = BestStrategy.MaxRobust;
 
         private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
@@ -43,6 +43,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
             this.MaxIterations = 500;
+            this.PlayoutIterations = 1;
             this.MaxIterationsProcessedPerFrame = 20;
             this.RandomGenerator = new System.Random();
         }
@@ -75,10 +76,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             var startTime = Time.realtimeSinceStartup;
             this.CurrentIterationsInFrame = 0;
 
-            while (this.CurrentIterationsInFrame < this.MaxIterationsProcessedPerFrame)
+            int MaxIterations = this.MaxIterationsProcessedPerFrame / PlayoutIterations;
+            while (this.CurrentIterationsInFrame < MaxIterations)
             {
                 MCTSNode newNode = Selection(selectedNode);
                 reward = Playout(newNode.State);
+                for (int i = 0; i < this.PlayoutIterations - 1; i++)
+                {
+                    Reward newReward = Playout(newNode.State);
+                    if (newReward.Value > reward.Value) reward = newReward;
+                }
                 Backpropagate(newNode, reward);
                 this.CurrentIterationsInFrame++;
             }
@@ -161,7 +168,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             float bestReward = bestChild.Q / bestChild.N;
             for (int i = 1; i < node.ChildNodes.Count; i++)
             {
-                float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + ExplorationFactor * ((float)Math.Log10(node.Parent.N) / node.N);
+                float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + C * ((float)Math.Log10(node.Parent.N) / node.N);
                 if (newReward > bestReward)
                 {
                     bestChild = node.ChildNodes[i];
