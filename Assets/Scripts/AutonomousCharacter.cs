@@ -122,7 +122,7 @@ namespace Assets.Scripts
             this.Actions = new List<Action>();
 
             this.Actions.Add(new ShieldOfFaith(this));
-
+            this.Actions.Add(new LayOnHands(this));
 
             foreach (var chest in GameObject.FindGameObjectsWithTag("Chest"))
             {
@@ -139,21 +139,33 @@ namespace Assets.Scripts
                 this.Actions.Add(new GetHealthPotion(this, potion));
             }
 
-            foreach (var enemy in GameObject.FindGameObjectsWithTag("Skeleton"))
+            GameObject[] skeletons = GameObject.FindGameObjectsWithTag("Skeleton");
+            foreach (var enemy in skeletons)
             {
                 this.Actions.Add(new SwordAttack(this, enemy));
                 this.Actions.Add(new DivineSmite(this, enemy));
             }
 
-            foreach (var enemy in GameObject.FindGameObjectsWithTag("Orc"))
+            GameObject[] orcs = GameObject.FindGameObjectsWithTag("Orc");
+            foreach (var enemy in orcs)
             {
                 this.Actions.Add(new SwordAttack(this, enemy));
             }
 
-            foreach (var enemy in GameObject.FindGameObjectsWithTag("Dragon"))
+            GameObject[] dragons = GameObject.FindGameObjectsWithTag("Dragon");
+            foreach (var enemy in dragons)
             {
                 this.Actions.Add(new SwordAttack(this, enemy));
             }
+
+            List<GameObject> allEnemies = new List<GameObject>();
+            allEnemies.AddRange(skeletons);
+            allEnemies.AddRange(orcs);
+            allEnemies.AddRange(dragons);
+
+            GameManager.enemies = allEnemies;
+
+            this.Actions.Add(new DivineWrath(this, allEnemies));
 
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
             if (MCTSActive) this.MCTS = new MCTS(worldModel);

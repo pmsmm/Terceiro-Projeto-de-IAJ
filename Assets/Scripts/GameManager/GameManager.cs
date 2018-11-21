@@ -43,15 +43,14 @@ namespace Assets.Scripts.GameManager
             this.characterData = new CharacterData(this.character);
             this.previousPosition = this.character.transform.position;
 
-            this.enemies = new List<GameObject>();
-            this.chests = GameObject.FindGameObjectsWithTag("Chest").ToList();
-            this.skeletons = GameObject.FindGameObjectsWithTag("Skeleton").ToList();
-            this.enemies.AddRange(this.skeletons);
-            this.orcs = GameObject.FindGameObjectsWithTag("Orc").ToList();
-            this.enemies.AddRange(this.orcs);
-            this.dragons = GameObject.FindGameObjectsWithTag("Dragon").ToList();
-            this.enemies.AddRange(this.dragons);
-            
+            //this.enemies = new List<GameObject>();
+            //this.chests = GameObject.FindGameObjectsWithTag("Chest").ToList();
+            //this.skeletons = GameObject.FindGameObjectsWithTag("Skeleton").ToList();
+            //this.enemies.AddRange(this.skeletons);
+            //this.orcs = GameObject.FindGameObjectsWithTag("Orc").ToList();
+            //this.enemies.AddRange(this.orcs);
+            //this.dragons = GameObject.FindGameObjectsWithTag("Dragon").ToList();
+            //this.enemies.AddRange(this.dragons);
         }
 
         public void Update()
