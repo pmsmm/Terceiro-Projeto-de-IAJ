@@ -49,7 +49,7 @@ namespace Assets.Scripts.DecisionMakingActions
 		{
             base.ApplyActionEffects(worldModel);
             worldModel.SetProperty(Properties.MANA, (int)worldModel.GetProperty(Properties.MANA) - 5);
-            worldModel.SetProperty(Properties.SHIELDHP, 5);
+            worldModel.SetProperty(Properties.ShieldHP, 5);
 
             //disables the target object so that it can't be reused again
             //worldModel.SetProperty(this.Target.name, false);

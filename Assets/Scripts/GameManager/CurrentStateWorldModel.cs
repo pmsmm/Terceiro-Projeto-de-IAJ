@@ -31,8 +31,6 @@ namespace Assets.Scripts.GameManager
 
             if (propertyName.Equals(Properties.XP)) return this.GameManager.characterData.XP;
 
-            if (propertyName.Equals(Properties.SHIELDHP)) return this.GameManager.characterData.ShieldHP;
-
             if (propertyName.Equals(Properties.MAXHP)) return this.GameManager.characterData.MaxHP;
 
             if (propertyName.Equals(Properties.HP)) return this.GameManager.characterData.HP;

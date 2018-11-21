@@ -1,30 +1,45 @@
 ﻿using Assets.Scripts.GameManager;
 using Assets.Scripts.IAJ.Unity.DecisionMaking.GOB;
+using Assets.Scripts.IAJ.Unity.Utils;
+using System;
 using UnityEngine;
 
 namespace Assets.Scripts.DecisionMakingActions
 {
     public class SwordAttack : WalkToTargetAndExecuteAction
     {
-        private int hpChange;
+        private float expectedHPChange;
+        private float expectedXPChange;
         private int xpChange;
+        private int enemyAC;
+        //how do you like lambda's in c#?
+        private Func<int> dmgRoll;
 
         public SwordAttack(AutonomousCharacter character, GameObject target) : base("SwordAttack",character,target)
         {
             if (target.tag.Equals("Skeleton"))
             {
-                this.hpChange = -2;
-                this.xpChange = 5;
+                this.dmgRoll = () => RandomHelper.RollD6();
+                this.expectedHPChange = 3.5f;
+                this.xpChange = 3;
+                this.expectedXPChange = 2.7f;
+                this.enemyAC = 10;
             }
             else if (target.tag.Equals("Orc"))
             {
-                this.hpChange = -5;
+                this.dmgRoll = () => RandomHelper.RollD10() + RandomHelper.RollD10();
+                this.expectedHPChange = 11.0f;
                 this.xpChange = 10;
+                this.expectedXPChange = 7.0f;
+                this.enemyAC = 14;
             }
             else if (target.tag.Equals("Dragon"))
             {
-                this.hpChange = -10;
-                this.xpChange = 15;
+                this.dmgRoll = () => RandomHelper.RollD12() + RandomHelper.RollD12() + RandomHelper.RollD12();
+                this.expectedHPChange = 19.5f;
+                this.xpChange = 20;
+                this.expectedXPChange = 10.0f;
+                this.enemyAC = 18;
             }
         }
 
@@ -34,16 +49,15 @@ namespace Assets.Scripts.DecisionMakingActions
 
             if (goal.Name == AutonomousCharacter.SURVIVE_GOAL)
             {
-                change += -this.hpChange;
+                change += this.expectedHPChange;
             }
             else if (goal.Name == AutonomousCharacter.GAIN_XP_GOAL)
             {
-                change += -this.xpChange;
+                change += -this.expectedXPChange;
             }
             
             return change;
         }
-
 
         public override void Execute()
         {
@@ -55,21 +69,42 @@ namespace Assets.Scripts.DecisionMakingActions
         {
             base.ApplyActionEffects(worldModel);
 
-            var xpValue = worldModel.GetGoalValue(AutonomousCharacter.GAIN_XP_GOAL);
-            worldModel.SetGoalValue(AutonomousCharacter.GAIN_XP_GOAL,xpValue-this.xpChange); 
+            int hp = (int)worldModel.GetProperty(Properties.HP);
+            int shieldHp = (int)worldModel.GetProperty(Properties.ShieldHP);
+            int xp = (int)worldModel.GetProperty(Properties.XP);
+            //execute the lambda function to calculate received damage based on the creature type
+            int damage = this.dmgRoll.Invoke();
 
+            //calculate player's damage
+            int remainingDamage = damage - shieldHp;
+            int remainingShield = Mathf.Max(0, shieldHp - damage);
+            int remainingHP;
+
+            if(remainingDamage > 0)
+            {
+                remainingHP = hp - remainingDamage;
+                worldModel.SetProperty(Properties.HP, remainingHP);
+            }
+
+            worldModel.SetProperty(Properties.ShieldHP, remainingShield);
             var surviveValue = worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL);
-            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL,surviveValue-this.hpChange);
+            worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, surviveValue - remainingDamage);
 
-            var hp = (int)worldModel.GetProperty(Properties.HP);
-            worldModel.SetProperty(Properties.HP,hp + this.hpChange);
-            var xp = (int)worldModel.GetProperty(Properties.XP);
-            worldModel.SetProperty(Properties.XP, xp + this.xpChange);
-           
 
-            //disables the target object so that it can't be reused again
-            worldModel.SetProperty(this.Target.name,false);
+            //calculate Hit
+            //attack roll = D20 + attack modifier. Using 7 as attack modifier (+4 str modifier, +3 proficiency bonus)
+            int attackRoll = RandomHelper.RollD20() + 7;
+
+            if (attackRoll >= enemyAC)
+            {
+                //there was an hit, enemy is destroyed, gain xp
+                //disables the target object so that it can't be reused again
+                worldModel.SetProperty(this.Target.name, false);
+
+                worldModel.SetProperty(Properties.XP, xp + this.xpChange);
+                var xpValue = worldModel.GetGoalValue(AutonomousCharacter.GAIN_XP_GOAL);
+                worldModel.SetGoalValue(AutonomousCharacter.GAIN_XP_GOAL, xpValue - this.xpChange);
+            }
         }
-
     }
 }

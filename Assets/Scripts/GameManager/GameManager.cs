@@ -18,7 +18,6 @@ namespace Assets.Scripts.GameManager
         public Text ManaText;
         public Text TimeText;
         public Text XPText;
-        public Text ShieldHPText;
         public Text LevelText;
         public Text MoneyText;
         public GameObject GameEnd;
@@ -57,14 +56,44 @@ namespace Assets.Scripts.GameManager
 
         public void Update()
         {
+
             if (Time.time > this.nextUpdateTime)
             {
                 this.nextUpdateTime = Time.time + UPDATE_INTERVAL;
                 this.characterData.Time += UPDATE_INTERVAL;
             }
 
+            if (enemyCharacter != null && currentEnemy != null && currentEnemy.activeSelf)
+            {
+                this.enemyCharacter.Movement.Target.position = this.character.transform.position;
+                this.enemyCharacter.Update();
+                this.SwordAttack(currentEnemy);
+            }
+            else
+            {
+                foreach (var enemy in this.enemies)
+                {
+                    if ((enemy.transform.position - this.character.transform.position).sqrMagnitude <= 400)
+                    {
+                        this.currentEnemy = enemy; 
+                        this.enemyCharacter = new DynamicCharacter(enemy)
+                        {
+                            MaxSpeed = 100
+                        };
+                        enemyCharacter.Movement = new DynamicSeek()
+                        {
+                            Character = enemyCharacter.KinematicData,
+                            MaxAcceleration = 100,
+                            Target = new IAJ.Unity.Movement.KinematicData()
+                        };
+
+                        break;
+                    }
+                }
+            }
+
+
             this.HPText.text = "HP: " + this.characterData.HP;
-            this.ShieldHPText.text = "Shield HP: " + this.characterData.ShieldHP;
             this.XPText.text = "XP: " + this.characterData.XP;
             this.LevelText.text = "Level: " + this.characterData.Level;
             this.TimeText.text = "Time: " + this.characterData.Time;
@@ -89,31 +118,21 @@ namespace Assets.Scripts.GameManager
             {
                 this.enemies.Remove(enemy);
                 enemy.SetActive(false);
-                Object.Destroy(enemy);
-                int damage = 0;
-
+                GameObject.Destroy(enemy);
                 if(enemy.tag.Equals("Skeleton"))
                 {
-                    damage = 2;
+                    this.characterData.HP -= 5;
                     this.characterData.XP += 5;
                 }
                 else if(enemy.tag.Equals("Orc"))
                 {
-                    damage = 5;
+                    this.characterData.HP -= 10;
                     this.characterData.XP += 10;
                 }
                 else if(enemy.tag.Equals("Dragon"))
                 {
-                    damage = 10;
-                    this.characterData.XP += 15;
-                }
-
-                int remainingDamage = damage - this.characterData.ShieldHP;
-                this.characterData.ShieldHP = Mathf.Max(0, this.characterData.ShieldHP - damage);
-
-                if(remainingDamage > 0)
-                {
-                    this.characterData.HP -= remainingDamage;
+                    this.characterData.HP -= 20;
+                    this.characterData.XP += 20;
                 }
 
                 this.WorldChanged = true;
@@ -122,26 +141,50 @@ namespace Assets.Scripts.GameManager
 
         public void DivineSmite(GameObject enemy)
         {
-            if (enemy != null && enemy.activeSelf && InDivineSmiteRange(enemy) && this.characterData.Mana >= 2)
+            if (enemy != null && enemy.activeSelf && InMeleeRange(enemy) && this.characterData.Mana >= 2)
             {
                 if (enemy.tag.Equals("Skeleton"))
                 {
-                    this.characterData.XP += 3;
                     this.enemies.Remove(enemy);
-                    Object.Destroy(enemy);
-                }
-                
-                this.characterData.Mana -= 2;
+                    enemy.SetActive(false);
+                    GameObject.Destroy(enemy);
 
+                    this.characterData.Mana -= 2;
+                }
                 this.WorldChanged = true;
             }
         }
 
         public void ShieldOfFaith()
         {
-            if(this.characterData.Mana >= 5)
+            if (this.characterData.Mana >= 5)
             {
                 this.characterData.ShieldHP = 5;
+                this.characterData.Mana -= 5;
+                this.WorldChanged = true;
+            }
+        }
+
+        public void Fireball(GameObject enemy)
+        {
+            if (enemy != null && enemy.activeSelf && InFireballRange(enemy) && this.characterData.Mana >= 5)
+            {
+                
+                if (enemy.tag.Equals("Skeleton"))
+                {
+                    this.characterData.XP += 5;
+                    this.enemies.Remove(enemy);
+                    GameObject.Destroy(enemy);
+                }
+                else if (enemy.tag.Equals("Orc"))
+                {
+                    this.characterData.XP += 10;
+                    this.enemies.Remove(enemy);
+                    GameObject.Destroy(enemy);
+                }
+                else if (enemy.tag.Equals("Dragon"))
+                {
+                }
                 this.characterData.Mana -= 5;
 
                 this.WorldChanged = true;
@@ -153,18 +196,40 @@ namespace Assets.Scripts.GameManager
             if (chest != null && chest.activeSelf && InChestRange(chest))
             {
                 this.chests.Remove(chest);
-                Object.Destroy(chest);
+                GameObject.Destroy(chest);
                 this.characterData.Money += 5;
                 this.WorldChanged = true;
             }
         }
-			
+
+        public void LevelUp()
+        {
+            if (this.characterData.Level == 3) return;
+            else if (this.characterData.Level == 2)
+            {
+                if(this.characterData.XP >= 30)
+                {
+                    this.characterData.Level = 3;
+                    this.characterData.MaxHP = 30;
+                    this.characterData.HP = 30;
+                    this.WorldChanged = true;
+                    return;
+                }
+            } 
+            else if (this.characterData.XP >= 10)
+            {
+                this.characterData.Level = 2;
+                this.characterData.MaxHP = 20;
+                this.characterData.HP = 20;
+                this.WorldChanged = true;
+            }
+        }
 
         public void GetManaPotion(GameObject manaPotion)
         {
             if (manaPotion != null && manaPotion.activeSelf && InPotionRange(manaPotion))
             {
-                Object.Destroy(manaPotion);
+                GameObject.Destroy(manaPotion);
                 this.characterData.Mana = 10;
                 this.WorldChanged = true;
             }
@@ -174,7 +239,7 @@ namespace Assets.Scripts.GameManager
         {
             if (potion != null && potion.activeSelf && InPotionRange(potion))
             {
-                Object.Destroy(potion);
+                GameObject.Destroy(potion);
                 this.characterData.HP = this.characterData.MaxHP;
                 this.WorldChanged = true;
             }
@@ -192,9 +257,9 @@ namespace Assets.Scripts.GameManager
             return this.CheckRange(enemy, 16.0f);
         }
 
-        public bool InDivineSmiteRange(GameObject enemy)
+        public bool InFireballRange(GameObject enemy)
         {
-            return this.CheckRange(enemy, 400.0f);
+            return this.CheckRange(enemy, 900.0f);
         }
 
         public bool InChestRange(GameObject chest)

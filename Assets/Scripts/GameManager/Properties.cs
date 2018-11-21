@@ -5,7 +5,7 @@
         public const string MANA = "Mana";
         public const string HP = "HP";
         public const string MAXHP = "MAXHP";
-        public const string SHIELDHP = "SHIELDHP";
+        public const string ShieldHP = "SHIELDHP";
         public const string XP = "XP";
         public const string TIME = "Time";
         public const string MONEY = "Money";

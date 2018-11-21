@@ -108,7 +108,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return currentNode;
         }
 
-        private Reward Playout(WorldModel initialPlayoutState)
+        virtual protected Reward Playout(WorldModel initialPlayoutState)
         {
             Reward reward = new Reward();
             while (!initialPlayoutState.IsTerminal())
@@ -124,7 +124,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return reward;
         }
 
-        private void Backpropagate(MCTSNode node, Reward reward)
+        protected virtual void Backpropagate(MCTSNode node, Reward reward)
         {
             while (node != null)
             {
@@ -138,10 +138,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             }
         }
 
-        private MCTSNode Expand(MCTSNode parent, GOB.Action action)
+        virtual protected MCTSNode Expand(MCTSNode parent, GOB.Action action)
         {
-            action.ApplyActionEffects(parent.State);
-            MCTSNode newNode = new MCTSNode(parent.State);
+            WorldModel newState = parent.State.GenerateChildWorldModel();
+            action.ApplyActionEffects(newState);
+            newState.CalculateNextPlayer();
+            MCTSNode newNode = new MCTSNode(newState);
             newNode.Parent = parent;
             newNode.Q = 0;
             newNode.N = 0;
@@ -151,7 +153,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         }
 
         //gets the best child of a node, using the UCT formula
-        private MCTSNode BestUCTChild(MCTSNode node)
+        protected virtual MCTSNode BestUCTChild(MCTSNode node)
         {
             if (node.ChildNodes.Count == 0) return null;
 

@@ -5,8 +5,8 @@ namespace Assets.Scripts.GameManager
     public class CharacterData
     {
         public int HP { get; set; }
-        public int ShieldHP { get; set; }
         public int MaxHP { get; set; }
+        public int ShieldHP { get; set; }
         public int Mana { get; set; }
         public int XP { get; set; }
         public float Time { get; set; }
@@ -18,8 +18,8 @@ namespace Assets.Scripts.GameManager
         {
             this.CharacterGameObject = gameObject;
             this.HP = 10;
-            this.ShieldHP = 0;
             this.MaxHP = 10;
+            this.ShieldHP = 0;
             this.Mana = 0;
             this.Money = 0;
             this.Time = 0;
