@@ -34,14 +34,16 @@ namespace Assets.Scripts.GameManager
             float time = (float)this.GetProperty(Properties.TIME);
             int money = (int)this.GetProperty(Properties.MONEY);
 
-            return HP <= 0 ||  time >= 200 || money == 25;
+            return HP <= 0 || time >= 200 || (this.NextPlayer == 0 && money == 25);
         }
 
         public override float GetScore()
         {
             int money = (int)this.GetProperty(Properties.MONEY);
+            int HP = (int)this.GetProperty(Properties.HP);
 
-            if (money == 25)
+            if (HP <= 0) return 0.0f;
+            else if (money == 25)
             {
                 return 1.0f;
             }
@@ -61,13 +63,13 @@ namespace Assets.Scripts.GameManager
             //basically if the character is close enough to an enemy, the next player will be the enemy.
             foreach (var enemy in this.GameManager.enemies)
             {
-                enemyEnabled = (bool) this.GetProperty(enemy.name);
-                if (enemyEnabled && (enemy.transform.position - position).sqrMagnitude <= 400)
+                enemyEnabled = (bool)this.GetProperty(enemy.name);
+                if (enemyEnabled && (enemy.transform.position - position).sqrMagnitude <= 100)
                 {
                     this.NextPlayer = 1;
                     this.NextEnemyAction = new SwordAttack(this.GameManager.autonomousCharacter, enemy);
                     this.NextEnemyActions = new Action[] { this.NextEnemyAction };
-                    return; 
+                    return;
                 }
             }
             this.NextPlayer = 0;

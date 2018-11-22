@@ -13,5 +13,10 @@ namespace Assets.Scripts.IAJ.Unity.Utils
         {
             return Random.Range(0, 1.0f) - Random.Range(0, 1.0f);
         }
+
+        public static int RollDice(int numberOfOptions)
+        {
+            return Random.Range(1, numberOfOptions);
+        }
     }
 }

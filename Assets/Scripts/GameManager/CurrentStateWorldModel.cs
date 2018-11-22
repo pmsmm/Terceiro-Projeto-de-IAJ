@@ -35,6 +35,8 @@ namespace Assets.Scripts.GameManager
 
             if (propertyName.Equals(Properties.HP)) return this.GameManager.characterData.HP;
 
+            if (propertyName.Equals(Properties.SHIELDHP)) return this.GameManager.characterData.ShieldHP;
+
             if (propertyName.Equals(Properties.MONEY)) return this.GameManager.characterData.Money;
 
             if (propertyName.Equals(Properties.TIME)) return this.GameManager.characterData.Time;

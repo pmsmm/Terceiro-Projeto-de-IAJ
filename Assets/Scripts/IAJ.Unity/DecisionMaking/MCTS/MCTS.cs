@@ -168,7 +168,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             float bestReward = bestChild.Q / bestChild.N;
             for (int i = 1; i < node.ChildNodes.Count; i++)
             {
-                float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + C * ((float)Math.Log10(node.Parent.N) / node.N);
+                float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + C * ((float)Math.Log10(node.N) / node.N);
                 if (newReward > bestReward)
                 {
                     bestChild = node.ChildNodes[i];

@@ -19,7 +19,7 @@ namespace Assets.Scripts.DecisionMakingActions
         {
             if (target.tag.Equals("Skeleton"))
             {
-                this.dmgRoll = () => RandomHelper.RollD6();
+                this.dmgRoll = () => RandomHelper.RollDice(6);
                 this.expectedHPChange = 3.5f;
                 this.xpChange = 3;
                 this.expectedXPChange = 2.7f;
@@ -27,7 +27,7 @@ namespace Assets.Scripts.DecisionMakingActions
             }
             else if (target.tag.Equals("Orc"))
             {
-                this.dmgRoll = () => RandomHelper.RollD10() + RandomHelper.RollD10();
+                this.dmgRoll = () => RandomHelper.RollDice(10) + RandomHelper.RollDice(10);
                 this.expectedHPChange = 11.0f;
                 this.xpChange = 10;
                 this.expectedXPChange = 7.0f;
@@ -35,7 +35,7 @@ namespace Assets.Scripts.DecisionMakingActions
             }
             else if (target.tag.Equals("Dragon"))
             {
-                this.dmgRoll = () => RandomHelper.RollD12() + RandomHelper.RollD12() + RandomHelper.RollD12();
+                this.dmgRoll = () => RandomHelper.RollDice(12) + RandomHelper.RollDice(12) + RandomHelper.RollDice(12);
                 this.expectedHPChange = 19.5f;
                 this.xpChange = 20;
                 this.expectedXPChange = 10.0f;
@@ -70,7 +70,7 @@ namespace Assets.Scripts.DecisionMakingActions
             base.ApplyActionEffects(worldModel);
 
             int hp = (int)worldModel.GetProperty(Properties.HP);
-            int shieldHp = (int)worldModel.GetProperty(Properties.ShieldHP);
+            int shieldHp = (int)worldModel.GetProperty(Properties.SHIELDHP);
             int xp = (int)worldModel.GetProperty(Properties.XP);
             //execute the lambda function to calculate received damage based on the creature type
             int damage = this.dmgRoll.Invoke();
@@ -86,14 +86,14 @@ namespace Assets.Scripts.DecisionMakingActions
                 worldModel.SetProperty(Properties.HP, remainingHP);
             }
 
-            worldModel.SetProperty(Properties.ShieldHP, remainingShield);
+            worldModel.SetProperty(Properties.SHIELDHP, remainingShield);
             var surviveValue = worldModel.GetGoalValue(AutonomousCharacter.SURVIVE_GOAL);
             worldModel.SetGoalValue(AutonomousCharacter.SURVIVE_GOAL, surviveValue - remainingDamage);
 
 
             //calculate Hit
             //attack roll = D20 + attack modifier. Using 7 as attack modifier (+4 str modifier, +3 proficiency bonus)
-            int attackRoll = RandomHelper.RollD20() + 7;
+            int attackRoll = RandomHelper.RollDice(20) + 7;
 
             if (attackRoll >= enemyAC)
             {
