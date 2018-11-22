@@ -36,15 +36,25 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
                 bestAction.ApplyActionEffects(initialPlayoutState);
                 reward.Value = initialPlayoutState.GetScore();
-                reward.PlayerID = 0;
+                reward.PlayerID = initialPlayoutState.GetNextPlayer();
             }
             return reward;
         }
 
         protected MCTSNode Expand(WorldModel parentState, GOB.Action action)
         {
-            //TODO: implement
             throw new NotImplementedException();
+
+            WorldModel newState = parentState.GenerateChildWorldModel();
+            action.ApplyActionEffects(newState);
+            newState.CalculateNextPlayer();
+            MCTSNode newNode = new MCTSNode(newState);
+            //newNode.Parent = parent;
+            newNode.Q = 0;
+            newNode.N = 0;
+            newNode.Action = action;
+            //parent.ChildNodes.Add(newNode);
+            return newNode;
         }
     }
 }

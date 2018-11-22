@@ -126,7 +126,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 GOB.Action chosenAction = possibleActions[actionIndex];
                 chosenAction.ApplyActionEffects(initialPlayoutState);
                 reward.Value = initialPlayoutState.GetScore();
-                reward.PlayerID = 0;
+                reward.PlayerID = initialPlayoutState.GetNextPlayer();
             }
             return reward;
         }
