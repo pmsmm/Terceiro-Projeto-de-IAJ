@@ -47,12 +47,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
 
         public Action ChooseAction()
         {
-			var processedActions = 0;
-			var startTime = Time.realtimeSinceStartup;
+            this.TotalActionCombinationsProcessed = 0;
+            var startTime = Time.realtimeSinceStartup;
 
             while (this.CurrentDepth >= 0)
             {
-                if (processedActions >= this.ActionCombinationsProcessedPerFrame) break;
+                if (this.TotalActionCombinationsProcessed >= this.ActionCombinationsProcessedPerFrame) break;
+                this.TotalActionCombinationsProcessed++;
 
                 if (this.CurrentDepth >= MAX_DEPTH)
                 {
@@ -73,7 +74,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                     this.Models[this.CurrentDepth + 1] = this.Models[this.CurrentDepth].GenerateChildWorldModel();
                     nextAction.ApplyActionEffects(this.Models[this.CurrentDepth + 1]);
                     this.ActionPerLevel[this.CurrentDepth] = nextAction;
-                    processedActions++;
+                    this.TotalActionCombinationsProcessed++;
                     this.CurrentDepth++;
                 }
                 else

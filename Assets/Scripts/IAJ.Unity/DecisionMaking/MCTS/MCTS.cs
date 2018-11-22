@@ -81,12 +81,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 MCTSNode newNode = Selection(selectedNode);
                 reward = Playout(newNode.State);
-                for (int i = 0; i < this.PlayoutIterations - 1; i++)
-                {
-                    Reward newReward = Playout(newNode.State);
-                    if (newReward.Value > reward.Value) reward = newReward;
-                }
-                Backpropagate(newNode, reward);
+                //for (int i = 0; i < this.PlayoutIterations - 1; i++)
+                //{
+                //    Reward newReward = Playout(newNode.State);
+                //    if (newReward.Value > reward.Value) reward = newReward;
+                //}
+                //Backpropagate(newNode, reward);
                 this.CurrentIterationsInFrame++;
             }
 
