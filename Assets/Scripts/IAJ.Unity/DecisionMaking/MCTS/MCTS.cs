@@ -30,7 +30,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private int CurrentIterations { get; set; }
         private int CurrentIterationsInFrame { get; set; }
         private int CurrentDepth { get; set; }
-        private readonly BestStrategy strategy = BestStrategy.MaxRobust;
+        private readonly BestStrategy strategy = BestStrategy.Max;
 
         private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
         private MCTSNode InitialNode { get; set; }
@@ -42,9 +42,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 500;
+            this.MaxIterations = 1000;
             this.PlayoutIterations = 1;
-            this.MaxIterationsProcessedPerFrame = 20;
+            this.MaxIterationsProcessedPerFrame = 100;
             this.RandomGenerator = new System.Random();
         }
 
@@ -70,7 +70,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         public GOB.Action Run()
         {
-            MCTSNode selectedNode = new MCTSNode(this.CurrentStateWorldModel.GenerateChildWorldModel());
+            MCTSNode selectedNode = new MCTSNode(new FutureStateWorldModel(this.CurrentStateWorldModel));
             Reward reward;
 
             var startTime = Time.realtimeSinceStartup;
@@ -86,7 +86,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 //    Reward newReward = Playout(newNode.State);
                 //    if (newReward.Value > reward.Value) reward = newReward;
                 //}
-                //Backpropagate(newNode, reward);
+                Backpropagate(newNode, reward);
                 this.CurrentIterationsInFrame++;
             }
 
@@ -125,6 +125,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 int actionIndex = this.RandomGenerator.Next(0, possibleActions.Length);
                 GOB.Action chosenAction = possibleActions[actionIndex];
                 chosenAction.ApplyActionEffects(initialPlayoutState);
+                initialPlayoutState.CalculateNextPlayer();
                 reward.Value = initialPlayoutState.GetScore();
                 reward.PlayerID = initialPlayoutState.GetNextPlayer();
             }
@@ -147,7 +148,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         virtual protected MCTSNode Expand(MCTSNode parent, GOB.Action action)
         {
-            WorldModel newState = parent.State.GenerateChildWorldModel();
+            FutureStateWorldModel newState = new FutureStateWorldModel((FutureStateWorldModel)parent.State);
             action.ApplyActionEffects(newState);
             newState.CalculateNextPlayer();
             MCTSNode newNode = new MCTSNode(newState);
