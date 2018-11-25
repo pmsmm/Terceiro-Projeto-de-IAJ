@@ -358,10 +358,10 @@ namespace Assets.Scripts
                 }
                 this.BestActionText.text = "Best Action Sequence: " + actionText;
             }
-            else
-            {
-                this.BestActionText.text = "Best Action Sequence:\nNone";
-            }
+            //else
+            //{
+            //    this.BestActionText.text = "Best Action Sequence:\nNone";
+            //}
         }
 
         public void StartPathfinding(Vector3 targetPosition)

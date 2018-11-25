@@ -94,7 +94,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InProgress = false;
 
             MCTSNode best = BestChild(selectedNode);
-            return (best != null ? best.Action : null);
+            BestActionSequence.Clear();
+            GOB.Action bestAction = best != null ? best.Action : null;
+            if (bestAction != null) BestActionSequence.Add(bestAction);
+            return (bestAction);
         }
 
         private MCTSNode Selection(MCTSNode initialNode)
@@ -185,9 +188,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             if (node.ChildNodes.Count == 0) return null;
 
-            MCTSNode bestChild = node.ChildNodes[0];
-            float bestReward = bestChild.Q / bestChild.N;
-            for (int i = 1; i < node.ChildNodes.Count; i++)
+            MCTSNode bestChild = null;
+            float bestReward = 0;
+            for (int i = 0; i < node.ChildNodes.Count; i++)
             {
                 float newReward = 0;
                 switch (strategy)
@@ -202,15 +205,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                         newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + node.ChildNodes[i].N;
                         break;
                     case BestStrategy.Secure:
-                        //TODO !!
+                        //TODO: !!
                         //newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N - A / Mathf.Sqrt(node.ChildNodes[i].N);
                         break;
                 }
-                if (newReward > bestReward)
+                if (newReward > bestReward || bestChild == null)
                 {
                     bestChild = node.ChildNodes[i];
                     bestReward = newReward;
                 }
+            }
+            if (bestChild == null || bestChild.Action == null)
+            {
+                BestActionSequence.Clear();
             }
             return bestChild;
         }

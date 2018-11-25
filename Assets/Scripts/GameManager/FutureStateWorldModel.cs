@@ -44,7 +44,11 @@ namespace Assets.Scripts.GameManager
             int MaxHP = (int)this.GetProperty(Properties.MAXHP);
             float time = (float)GetProperty(Properties.TIME);
 
-            return (((float)money / 25f) * ((float)HP / (float)MaxHP)) /*/ time*/;
+            if (time - (float)Parent.GetProperty(Properties.TIME) < 1f) return 1f;
+
+            float moneyScore = (float)money / 25f;
+            float hpScore = (float)HP / (float)MaxHP;
+            return (moneyScore * hpScore) / (time * 10f);
         }
 
         public override int GetNextPlayer()

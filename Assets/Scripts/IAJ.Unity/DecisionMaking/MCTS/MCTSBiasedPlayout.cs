@@ -13,21 +13,21 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected override Reward Playout(WorldModel initialPlayoutState)
         {
+            FutureStateWorldModel futureModel = (FutureStateWorldModel)initialPlayoutState;
             Reward reward = new Reward();
             while (!initialPlayoutState.IsTerminal())
             {
                 GOB.Action[] possibleActions = initialPlayoutState.GetExecutableActions();
-                GOB.Action bestAction = possibleActions[0];
-                WorldModel model = initialPlayoutState.GenerateChildWorldModel();
-                bestAction.ApplyActionEffects(model);
-                float bestScore = model.GetScore();
+                GOB.Action bestAction = null;
+                float bestScore = 0f;
 
-                for (int i = 1; i < possibleActions.Length; i++)
+                for (int i = 0; i < possibleActions.Length; i++)
                 {
-                    WorldModel newModel = initialPlayoutState.GenerateChildWorldModel();
+                    FutureStateWorldModel newModel = new FutureStateWorldModel(futureModel);
                     possibleActions[i].ApplyActionEffects(newModel);
+                    newModel.CalculateNextPlayer();
                     float newScore = newModel.GetScore();
-                    if (newScore > bestScore)
+                    if (bestAction == null || newScore > bestScore)
                     {
                         bestAction = possibleActions[i];
                         bestScore = newScore;
@@ -43,13 +43,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected MCTSNode Expand(WorldModel parentState, GOB.Action action)
         {
-            throw new NotImplementedException();
+            FutureStateWorldModel futureModel = (FutureStateWorldModel)parentState;
+            action.ApplyActionEffects(futureModel);
 
-            WorldModel newState = parentState.GenerateChildWorldModel();
-            action.ApplyActionEffects(newState);
-            newState.CalculateNextPlayer();
-            MCTSNode newNode = new MCTSNode(newState);
-            //newNode.Parent = parent;
+            MCTSNode newNode = new MCTSNode(futureModel);
+            //TODO: Where to find parent?
+            //newNode.Parent = ;
             newNode.Q = 0;
             newNode.N = 0;
             newNode.Action = action;
