@@ -35,7 +35,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
         private MCTSNode InitialNode { get; set; }
         private System.Random RandomGenerator { get; set; }
-        
+        public AutonomousCharacter autonomousCharacter;
         
 
         public MCTS(CurrentStateWorldModel currentStateWorldModel)

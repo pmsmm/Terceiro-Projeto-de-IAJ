@@ -168,10 +168,14 @@ namespace Assets.Scripts
             this.Actions.Add(new DivineWrath(this, allEnemies));
 
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
-            if (MCTSActive) this.MCTS = new MCTS(worldModel);
-            //if (MCTSActive) this.MCTS = new MCTSBiasedPlayout(worldModel);
-            //if (MCTSActive) this.MCTS = new MCTSRAVE(worldModel);
-            else this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel,this.Actions,this.Goals);
+            if (MCTSActive)
+            {
+                this.MCTS = new MCTS(worldModel);
+                //this.MCTS = new MCTSBiasedPlayout(worldModel);
+                //this.MCTS = new MCTSRAVE(worldModel);
+                this.MCTS.autonomousCharacter = this;
+            }
+            else this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
             
         }
 

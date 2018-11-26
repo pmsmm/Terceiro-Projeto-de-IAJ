@@ -19,18 +19,17 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 GOB.Action[] possibleActions = initialPlayoutState.GetExecutableActions();
                 GOB.Action bestAction = null;
-                float bestScore = 0f;
+                float bestChange = 0f;
 
                 for (int i = 0; i < possibleActions.Length; i++)
                 {
-                    FutureStateWorldModel newModel = new FutureStateWorldModel(futureModel);
-                    possibleActions[i].ApplyActionEffects(newModel);
-                    newModel.CalculateNextPlayer();
-                    float newScore = newModel.GetScore();
-                    if (bestAction == null || newScore > bestScore)
+                    float moneyGoalChange = possibleActions[i].GetGoalChange(autonomousCharacter.GetRichGoal);
+                    float hpGoalChange = possibleActions[i].GetGoalChange(autonomousCharacter.SurviveGoal);
+                    float goalChange = moneyGoalChange + hpGoalChange;
+                    if (bestAction == null || goalChange > bestChange)
                     {
+                        bestChange = goalChange;
                         bestAction = possibleActions[i];
-                        bestScore = newScore;
                     }
                 }
 
