@@ -13,7 +13,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected override Reward Playout(WorldModel initialPlayoutState)
         {
-            FutureStateWorldModel futureModel = (FutureStateWorldModel)initialPlayoutState;
             Reward reward = new Reward();
             while (!initialPlayoutState.IsTerminal())
             {
@@ -40,19 +39,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             return reward;
         }
 
-        protected MCTSNode Expand(WorldModel parentState, GOB.Action action)
-        {
-            FutureStateWorldModel futureModel = (FutureStateWorldModel)parentState;
-            action.ApplyActionEffects(futureModel);
-
-            MCTSNode newNode = new MCTSNode(futureModel);
-            //TODO: Where to find parent?
-            //newNode.Parent = ;
-            newNode.Q = 0;
-            newNode.N = 0;
-            newNode.Action = action;
-            //parent.ChildNodes.Add(newNode);
-            return newNode;
-        }
+        //protected MCTSNode Expand(WorldModel parentState, GOB.Action action)
+        //{
+        //}
     }
 }

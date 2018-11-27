@@ -70,7 +70,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         public GOB.Action Run()
         {
-            MCTSNode selectedNode = new MCTSNode(new FutureStateWorldModel(this.CurrentStateWorldModel));
+            MCTSNode selectedNode = new MCTSNode(this.CurrentStateWorldModel);
             Reward reward;
 
             var startTime = Time.realtimeSinceStartup;
