@@ -43,7 +43,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
             //this.MaxIterations = 1000;
-            this.PlayoutIterations = 1;
+            this.PlayoutIterations = 5;
             this.MaxIterationsProcessedPerFrame = 1000;
             this.RandomGenerator = new System.Random();
         }
@@ -73,26 +73,38 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             //TODO: Execute MCTS PlayoutIterations times
             var startTime = Time.realtimeSinceStartup;
             this.CurrentIterationsInFrame = 0;
-            MCTSNode selectedNode = new MCTSNode(this.CurrentStateWorldModel);
-            for (int i = 0; i < PlayoutIterations; i++)
+            int MaxIterations = this.MaxIterationsProcessedPerFrame / this.PlayoutIterations;
+            MCTSNode selectedNode = null;
+            List<float> results = new List<float>();
+
+            int i = 0;
+            for (i = 0; i < this.PlayoutIterations; i++)
             {
+                selectedNode = new MCTSNode(this.CurrentStateWorldModel);
                 Reward reward;
 
-                int MaxIterations = this.MaxIterationsProcessedPerFrame / PlayoutIterations;
                 while (this.CurrentIterationsInFrame < MaxIterations)
                 {
                     MCTSNode newNode = Selection(selectedNode);
                     reward = Playout(newNode.State);
                     Backpropagate(newNode, reward);
                     this.CurrentIterationsInFrame++;
-                    //Update childOptions data
+                }
+
+                for (int j = 0; j < selectedNode.ChildNodes.Count; j++)
+                {
+                    if (results.Count <= j) results.Add(selectedNode.ChildNodes[j].Q / selectedNode.ChildNodes[j].N);
+                    else results[j] += selectedNode.ChildNodes[j].Q / selectedNode.ChildNodes[j].N;
+
+                    if (i == this.PlayoutIterations - 1) results[j] /= this.PlayoutIterations;
                 }
             }
 
             this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
             this.InProgress = false;
 
-            MCTSNode best = BestChild(selectedNode);
+            //MCTSNode best = BestChild(selectedNode);
+            MCTSNode best = BestAverageChild(selectedNode, results);
             BestActionSequence.Clear();
             GOB.Action bestAction = best != null ? best.Action : null;
             if (bestAction != null) BestActionSequence.Add(bestAction);
@@ -186,7 +198,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         //the exploration factor
         private MCTSNode BestChild(MCTSNode node)
         {
-            //TODO: Gather data from several MCTS'
             if (node.ChildNodes.Count == 0) return null;
 
             float A = C * (float)Math.Sqrt(node.N);
@@ -210,6 +221,26 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                         newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N - A / Mathf.Sqrt(node.ChildNodes[i].N);
                         break;
                 }
+                if (newReward > bestReward || bestChild == null)
+                {
+                    bestChild = node.ChildNodes[i];
+                    bestReward = newReward;
+                }
+            }
+            if (bestChild == null || bestChild.Action == null)
+            {
+                BestActionSequence.Clear();
+            }
+            return bestChild;
+        }
+
+        private MCTSNode BestAverageChild(MCTSNode node, List<float> results)
+        {
+            MCTSNode bestChild = null;
+            float bestReward = 0;
+            for (int i = 0; i < results.Count; i++)
+            {
+                float newReward = results[i];
                 if (newReward > bestReward || bestChild == null)
                 {
                     bestChild = node.ChildNodes[i];
