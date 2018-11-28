@@ -13,34 +13,58 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         protected override Reward Playout(WorldModel initialPlayoutState)
         {
+            FutureStateWorldModel newState = new FutureStateWorldModel((FutureStateWorldModel)initialPlayoutState);
             Reward reward = new Reward();
-            while (!initialPlayoutState.IsTerminal())
+            while (!newState.IsTerminal())
             {
-                GOB.Action[] possibleActions = initialPlayoutState.GetExecutableActions();
+                GOB.Action[] possibleActions = newState.GetExecutableActions();
                 GOB.Action bestAction = null;
-                float bestChange = 0f;
+                float chosenScore = 0f;
+
+                //TODO: Add randomness
+                //float heuristics[] = new float[];
 
                 for (int i = 0; i < possibleActions.Length; i++)
                 {
-                    float moneyGoalChange = possibleActions[i].GetGoalChange(autonomousCharacter.GetRichGoal);
-                    float hpGoalChange = possibleActions[i].GetGoalChange(autonomousCharacter.SurviveGoal);
-                    float goalChange = moneyGoalChange + hpGoalChange;
-                    if (bestAction == null || goalChange > bestChange)
+                    float heuristicValue = Heuristic(newState, possibleActions[i]);
+                    if (bestAction == null || heuristicValue > chosenScore)
                     {
-                        bestChange = goalChange;
+                        chosenScore = heuristicValue;
                         bestAction = possibleActions[i];
                     }
                 }
 
-                bestAction.ApplyActionEffects(initialPlayoutState);
-                reward.Value = initialPlayoutState.GetScore();
-                reward.PlayerID = initialPlayoutState.GetNextPlayer();
+                bestAction.ApplyActionEffects(newState);
+                reward.Value = chosenScore;
+                reward.PlayerID = 0;
             }
             return reward;
         }
 
-        //protected MCTSNode Expand(WorldModel parentState, GOB.Action action)
-        //{
-        //}
+        float Heuristic(WorldModel state, GOB.Action action)
+        {
+            if (action.Name == "DivineWrath") return 1f;
+            if (action.Name == "LevelUp") return 1f;
+
+            int money = (int)state.GetProperty(Properties.MONEY);
+            int HP = (int)state.GetProperty(Properties.HP);
+            int MaxHP = (int)state.GetProperty(Properties.MAXHP);
+            float time = (float)state.GetProperty(Properties.TIME);
+
+            float moneyScore = (float)money / 25f;
+            float hpScore = (float)HP / (float)MaxHP;
+            float timeScore = time / 200f;
+
+            if (hpScore < 0.5f)
+            {
+                if (action.Name == "LayOnHands") return 1f;
+                if (action.Name == "GetHealthPotion") return 0.7f + 0.3f / action.GetDuration();
+                if (action.Name == "SwordAttack") return 0.1f;
+            }
+
+            if (moneyScore >= 0.95f) return 1.1f;
+
+            return timeScore;
+        }
     }
 }

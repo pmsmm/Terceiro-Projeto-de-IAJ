@@ -24,7 +24,7 @@ namespace Assets.Scripts
         public const string BE_QUICK_GOAL = "BeQuick";
         public const string GET_RICH_GOAL = "GetRich";
 
-        public const float DECISION_MAKING_INTERVAL = 10.0f;
+        public const float DECISION_MAKING_INTERVAL = 30.0f;
         //public fields to be set in Unity Editor
         public GameManager.GameManager GameManager;
         public Text SurviveGoalText;
@@ -170,13 +170,12 @@ namespace Assets.Scripts
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
             if (MCTSActive)
             {
-                this.MCTS = new MCTS(worldModel);
-                //this.MCTS = new MCTSBiasedPlayout(worldModel);
+                //this.MCTS = new MCTS(worldModel);
+                this.MCTS = new MCTSBiasedPlayout(worldModel);
                 //this.MCTS = new MCTSRAVE(worldModel);
                 this.MCTS.autonomousCharacter = this;
             }
             else this.GOAPDecisionMaking = new DepthLimitedGOAPDecisionMaking(worldModel, this.Actions, this.Goals);
-            
         }
 
         void Update()

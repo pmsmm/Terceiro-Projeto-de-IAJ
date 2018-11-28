@@ -104,7 +104,8 @@ namespace Assets.Scripts.GameManager
             if (this.characterData.HP <= 0 || this.characterData.Time >= 200)
             {
                 this.GameEnd.SetActive(true);
-                this.GameEnd.GetComponentInChildren<Text>().text = "Game Over";
+                if (this.characterData.HP <= 0) this.GameEnd.GetComponentInChildren<Text>().text = "Defeat";
+                else if (this.characterData.Time >= 200) this.GameEnd.GetComponentInChildren<Text>().text = "Game Over";
             }
             else if (this.characterData.Money >= 25)
             {

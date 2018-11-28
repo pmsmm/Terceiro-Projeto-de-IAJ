@@ -42,9 +42,9 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            this.MaxIterations = 1000;
+            //this.MaxIterations = 1000;
             this.PlayoutIterations = 1;
-            this.MaxIterationsProcessedPerFrame = 100;
+            this.MaxIterationsProcessedPerFrame = 1000;
             this.RandomGenerator = new System.Random();
         }
 
@@ -70,24 +70,23 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         public GOB.Action Run()
         {
-            MCTSNode selectedNode = new MCTSNode(this.CurrentStateWorldModel);
-            Reward reward;
-
+            //TODO: Execute MCTS PlayoutIterations times
             var startTime = Time.realtimeSinceStartup;
             this.CurrentIterationsInFrame = 0;
-
-            int MaxIterations = this.MaxIterationsProcessedPerFrame / PlayoutIterations;
-            while (this.CurrentIterationsInFrame < MaxIterations)
+            MCTSNode selectedNode = new MCTSNode(this.CurrentStateWorldModel);
+            for (int i = 0; i < PlayoutIterations; i++)
             {
-                MCTSNode newNode = Selection(selectedNode);
-                reward = Playout(newNode.State);
-                //for (int i = 0; i < this.PlayoutIterations - 1; i++)
-                //{
-                //    Reward newReward = Playout(newNode.State);
-                //    if (newReward.Value > reward.Value) reward = newReward;
-                //}
-                Backpropagate(newNode, reward);
-                this.CurrentIterationsInFrame++;
+                Reward reward;
+
+                int MaxIterations = this.MaxIterationsProcessedPerFrame / PlayoutIterations;
+                while (this.CurrentIterationsInFrame < MaxIterations)
+                {
+                    MCTSNode newNode = Selection(selectedNode);
+                    reward = Playout(newNode.State);
+                    Backpropagate(newNode, reward);
+                    this.CurrentIterationsInFrame++;
+                    //Update childOptions data
+                }
             }
 
             this.TotalProcessingTime += Time.realtimeSinceStartup - startTime;
@@ -120,17 +119,18 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         virtual protected Reward Playout(WorldModel initialPlayoutState)
         {
+            FutureStateWorldModel newState = new FutureStateWorldModel((FutureStateWorldModel)initialPlayoutState);
             Reward reward = new Reward();
-            while (!initialPlayoutState.IsTerminal())
+            while (!newState.IsTerminal())
             {
-                GOB.Action[] possibleActions = initialPlayoutState.GetExecutableActions();
+                GOB.Action[] possibleActions = newState.GetExecutableActions();
 
                 int actionIndex = this.RandomGenerator.Next(0, possibleActions.Length);
                 GOB.Action chosenAction = possibleActions[actionIndex];
-                chosenAction.ApplyActionEffects(initialPlayoutState);
-                initialPlayoutState.CalculateNextPlayer();
-                reward.Value = initialPlayoutState.GetScore();
-                reward.PlayerID = initialPlayoutState.GetNextPlayer();
+                chosenAction.ApplyActionEffects(newState);
+                newState.CalculateNextPlayer();
+                reward.Value = newState.GetScore();
+                reward.PlayerID = 0;
             }
             return reward;
         }
@@ -186,8 +186,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         //the exploration factor
         private MCTSNode BestChild(MCTSNode node)
         {
+            //TODO: Gather data from several MCTS'
             if (node.ChildNodes.Count == 0) return null;
 
+            float A = C * (float)Math.Sqrt(node.N);
             MCTSNode bestChild = null;
             float bestReward = 0;
             for (int i = 0; i < node.ChildNodes.Count; i++)
@@ -205,8 +207,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                         newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + node.ChildNodes[i].N;
                         break;
                     case BestStrategy.Secure:
-                        //TODO: !!
-                        //newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N - A / Mathf.Sqrt(node.ChildNodes[i].N);
+                        newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N - A / Mathf.Sqrt(node.ChildNodes[i].N);
                         break;
                 }
                 if (newReward > bestReward || bestChild == null)
