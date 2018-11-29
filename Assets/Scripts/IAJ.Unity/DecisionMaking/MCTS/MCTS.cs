@@ -74,13 +74,12 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             var startTime = Time.realtimeSinceStartup;
             this.CurrentIterationsInFrame = 0;
             int MaxIterations = this.MaxIterationsProcessedPerFrame / this.PlayoutIterations;
-            MCTSNode selectedNode = null;
+            MCTSNode selectedNode = new MCTSNode(this.CurrentStateWorldModel.GenerateChildWorldModel());
             List<float> results = new List<float>();
 
             int i = 0;
             for (i = 0; i < this.PlayoutIterations; i++)
             {
-                selectedNode = new MCTSNode(this.CurrentStateWorldModel);
                 Reward reward;
 
                 while (this.CurrentIterationsInFrame < MaxIterations)

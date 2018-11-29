@@ -170,8 +170,8 @@ namespace Assets.Scripts
             var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
             if (MCTSActive)
             {
-                //this.MCTS = new MCTS(worldModel);
-                this.MCTS = new MCTSBiasedPlayout(worldModel);
+                this.MCTS = new MCTS(worldModel);
+                //this.MCTS = new MCTSBiasedPlayout(worldModel);
                 //this.MCTS = new MCTSRAVE(worldModel);
                 this.MCTS.autonomousCharacter = this;
             }
