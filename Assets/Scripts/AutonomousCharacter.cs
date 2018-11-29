@@ -93,20 +93,20 @@ namespace Assets.Scripts
             //initialization of the GOB decision making
             //let's start by creating 4 main goals
 
-            this.SurviveGoal = new Goal(SURVIVE_GOAL, 0.2f);
+            this.SurviveGoal = new Goal(SURVIVE_GOAL, 0.2f, 0);
 
-            this.GainXPGoal = new Goal(GAIN_XP_GOAL, 0.1f)
+            this.GainXPGoal = new Goal(GAIN_XP_GOAL, 0.1f, 1)
             {
                 ChangeRate = 0.1f
             };
 
-            this.GetRichGoal = new Goal(GET_RICH_GOAL, 0.1f)
+            this.GetRichGoal = new Goal(GET_RICH_GOAL, 0.1f, 2)
             {
                 InsistenceValue = 5.0f,
                 ChangeRate = 0.2f
             };
 
-            this.BeQuickGoal = new Goal(BE_QUICK_GOAL, 8.0f)
+            this.BeQuickGoal = new Goal(BE_QUICK_GOAL, 8.0f, 3)
             {
                 ChangeRate = 0.1f
             };
