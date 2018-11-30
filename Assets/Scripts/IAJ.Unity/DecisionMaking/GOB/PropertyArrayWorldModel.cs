@@ -24,7 +24,26 @@ namespace Assets.Scripts.GameManager
                                                                 { Properties.TIME, 0f },
                                                                 { Properties.XP, 0 },
                                                                 { Properties.LEVEL, 1 },
-                                                                { Properties.HP, gameManager.character.transform.position },
+                                                                { Properties.POSITION, gameManager.character.transform.position },
+                                                                { "Skeleton1", true },
+                                                                { "Skeleton2", true },
+                                                                { "Skeleton3", true },
+                                                                { "Skeleton4", true },
+                                                                { "Skeleton5", true },
+                                                                { "Skeleton6", true },
+                                                                { "Skeleton7", true },
+                                                                { "Orc1", true },
+                                                                { "Orc2", true },
+                                                                { "Dragon", true },
+                                                                { "ManaPotion1", true },
+                                                                { "ManaPotion2", true },
+                                                                { "HealthPotion1", true },
+                                                                { "HealthPotion2", true },
+                                                                { "Chest1", true },
+                                                                { "Chest2", true },
+                                                                { "Chest3", true },
+                                                                { "Chest4", true },
+                                                                { "Chest5", true },
                                                                 };
             this.GoalValues = new Dictionary<string, float>     {
                                                                 {AutonomousCharacter.BE_QUICK_GOAL, 0f },
@@ -38,6 +57,11 @@ namespace Assets.Scripts.GameManager
         {
             this.AllProperties = parent.AllProperties;
             this.GoalValues = parent.GoalValues;
+        }
+
+        public void Initialize()
+        {
+            this.ActionEnumerator.Reset();
         }
 
         public override object GetProperty(string propertyIndex)
@@ -99,7 +123,7 @@ namespace Assets.Scripts.GameManager
             //basically if the character is close enough to an enemy, the next player will be the enemy.
             foreach (var enemy in this.GameManager.enemies)
             {
-                enemyEnabled = (bool)this.GetProperty(enemy.name);
+                enemyEnabled = (bool)this.AllProperties[enemy.name];
                 if (enemyEnabled && (enemy.transform.position - (Vector3)this.AllProperties[Properties.POSITION]).sqrMagnitude <= 100)
                 {
                     this.NextPlayer = 1;

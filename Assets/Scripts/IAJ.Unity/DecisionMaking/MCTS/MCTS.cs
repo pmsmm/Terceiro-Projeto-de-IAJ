@@ -32,17 +32,16 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private int CurrentDepth { get; set; }
         private readonly BestStrategy strategy = BestStrategy.Max;
 
-        private CurrentStateWorldModel CurrentStateWorldModel { get; set; }
+        private PropertyArrayWorldModel CurrentStateWorldModel { get; set; }
         private MCTSNode InitialNode { get; set; }
         private System.Random RandomGenerator { get; set; }
         public AutonomousCharacter autonomousCharacter;
         
 
-        public MCTS(CurrentStateWorldModel currentStateWorldModel)
+        public MCTS(PropertyArrayWorldModel currentStateWorldModel)
         {
             this.InProgress = false;
             this.CurrentStateWorldModel = currentStateWorldModel;
-            //this.MaxIterations = 1000;
             this.PlayoutIterations = 5;
             this.MaxIterationsProcessedPerFrame = 1000;
             this.RandomGenerator = new System.Random();

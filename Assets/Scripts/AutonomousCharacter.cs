@@ -167,7 +167,7 @@ namespace Assets.Scripts
 
             this.Actions.Add(new DivineWrath(this, allEnemies));
 
-            var worldModel = new CurrentStateWorldModel(this.GameManager, this.Actions, this.Goals);
+            var worldModel = new PropertyArrayWorldModel(this.GameManager, this.Actions);
             if (MCTSActive)
             {
                 this.MCTS = new MCTS(worldModel);

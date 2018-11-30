@@ -7,7 +7,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class MCTSBiasedPlayout : MCTS
     {
-        public MCTSBiasedPlayout(CurrentStateWorldModel currentStateWorldModel) : base(currentStateWorldModel)
+        public MCTSBiasedPlayout(PropertyArrayWorldModel currentStateWorldModel) : base(currentStateWorldModel)
         {
         }
 
