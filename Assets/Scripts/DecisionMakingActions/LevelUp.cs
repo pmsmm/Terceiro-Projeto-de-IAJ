@@ -11,6 +11,7 @@ namespace Assets.Scripts.DecisionMakingActions
         public LevelUp(AutonomousCharacter character) : base("LevelUp")
         {
             this.Character = character;
+            this.Utility = 1f;
         }
 
         public override void ApplyActionEffects(WorldModel worldModel)

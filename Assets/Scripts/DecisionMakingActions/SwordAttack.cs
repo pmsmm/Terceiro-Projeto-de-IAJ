@@ -41,6 +41,8 @@ namespace Assets.Scripts.DecisionMakingActions
                 this.expectedXPChange = 10.0f;
                 this.enemyAC = 18;
             }
+
+            this.Utility = 0.1f;
         }
 
         public override float GetGoalChange(Goal goal)

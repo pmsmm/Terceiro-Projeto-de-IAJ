@@ -12,7 +12,8 @@ namespace Assets.Scripts.DecisionMakingActions
 		public ShieldOfFaith(AutonomousCharacter character) : base("ShieldOfFaith")
 		{
             this.Character = character;
-		}
+            this.Utility = 0.4f;
+        }
 
 		public override float GetGoalChange(Goal goal)
 		{

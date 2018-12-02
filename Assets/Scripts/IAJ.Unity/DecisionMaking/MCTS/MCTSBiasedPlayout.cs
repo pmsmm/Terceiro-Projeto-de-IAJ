@@ -29,7 +29,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 int i;
                 for (i = 0; i < possibleActions.Length; i++)
                 {
-                    results.Add(Heuristic(newState, possibleActions[i]));
+                    //results.Add(Heuristic(newState, possibleActions[i]));
+                    results.Add(possibleActions[i].GetUtility());
                 }
 
                 GOB.Action bestAction = null;
@@ -60,7 +61,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         float Heuristic(WorldModel state, GOB.Action action)
         {
             if (action.Name == "LevelUp") return 1f;
-            if (action.Name == "DivineWrath") return 1f;    //Precisamos de saber a Target de modo a usar isto de forma inteligente
+            if (action.Name == "DivineWrath") return 1f;
 
             int money = (int)state.GetProperty(Properties.MONEY);
             int mana = (int)state.GetProperty(Properties.MANA);

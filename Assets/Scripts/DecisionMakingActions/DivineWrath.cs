@@ -16,7 +16,9 @@ namespace Assets.Scripts.DecisionMakingActions
 		{
             this.Character = character;
             this.Enemies = enemies;
-		}
+
+            this.Utility = 1f;
+        }
 
 		public override bool CanExecute()
 		{

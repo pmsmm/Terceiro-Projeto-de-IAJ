@@ -14,6 +14,8 @@ namespace Assets.Scripts.DecisionMakingActions
             if (target.tag.Equals("Skeleton")) this.xpChange = 5;
             else if (target.tag.Equals("Orc")) this.xpChange = 10;
             else if (target.tag.Equals("Dragon")) this.xpChange = 15;
+
+            this.Utility = 0.8f;
         }
 
 		public override float GetGoalChange(Goal goal)

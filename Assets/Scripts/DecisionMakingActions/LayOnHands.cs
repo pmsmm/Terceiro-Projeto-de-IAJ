@@ -10,7 +10,8 @@ namespace Assets.Scripts.DecisionMakingActions
 		public LayOnHands(AutonomousCharacter character) : base("LayOnHands")
 		{
             this.Character = character;
-		}
+            this.Utility = 0.6f;
+        }
 
         public override bool CanExecute()
 		{

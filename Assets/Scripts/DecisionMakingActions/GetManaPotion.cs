@@ -8,6 +8,7 @@ namespace Assets.Scripts.DecisionMakingActions
     {
         public GetManaPotion(AutonomousCharacter character, GameObject target) : base("GetManaPotion",character,target)
         {
+            this.Utility = 0.25f;
         }
 
         public override bool CanExecute()

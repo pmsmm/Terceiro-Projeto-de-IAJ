@@ -9,6 +9,7 @@ namespace Assets.Scripts.DecisionMakingActions
     {
         public GetHealthPotion(AutonomousCharacter character, GameObject target) : base("GetHealthPotion",character,target)
         {
+            this.Utility = 0.4f;
         }
 
 		public override bool CanExecute()

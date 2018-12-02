@@ -9,17 +9,13 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
         public int ID { get; set; }
         private Dictionary<Goal, float> GoalEffects { get; set; }
         public float Duration { get; set; }
+        protected float Utility { get; set; }
 
         public Action(string name)
         {
             this.ID = Action.ActionID++;
             this.Name = name;
             this.GoalEffects = new Dictionary<Goal, float>();
-        }
-
-        public void AddEffect(Goal goal, float goalChange)
-        {
-            this.GoalEffects[goal] = goalChange;
         }
 
         public virtual float GetGoalChange(Goal goal)
@@ -29,6 +25,11 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.GOB
                 return this.GoalEffects[goal];
             }
             else return 0.0f;
+        }
+
+        public virtual float GetUtility()
+        {
+            return this.Utility;
         }
 
         public virtual float GetDuration()

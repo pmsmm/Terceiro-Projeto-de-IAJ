@@ -36,7 +36,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         private MCTSNode InitialNode { get; set; }
         protected System.Random RandomGenerator { get; set; }
         public AutonomousCharacter autonomousCharacter;
-        
 
         public MCTS(PropertyArrayWorldModel currentStateWorldModel)
         {
@@ -183,6 +182,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             for (int i = 1; i < node.ChildNodes.Count; i++)
             {
                 float newReward = node.ChildNodes[i].Q / node.ChildNodes[i].N + C * ((float)Math.Log10(node.N) / node.N);
+
                 if (newReward > bestReward)
                 {
                     bestChild = node.ChildNodes[i];

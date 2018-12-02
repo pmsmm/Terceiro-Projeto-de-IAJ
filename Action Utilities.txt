@@ -1,0 +1,9 @@
+DivineSmite - kill 1 target         Utility: 0.8f
+DivineWrath - kill all targets      Utility: 1f
+GetHealthPotion                     Utility: 0.4f
+GetManaPotion                       Utility: 0.25f
+LayOnHands - regenerate hp to max   Utility: 0.6f
+LevelUp                             Utility: 1f
+PickUpChest                         Utility: 0.2f
+ShieldOfFaith                       Utility: 0.4f
+SwordAttack                         Utility: 0.1f
