@@ -3,14 +3,16 @@
     public class Goal
     {
         public string Name { get; private set; }
+        public int Index { get; private set; }
         public float InsistenceValue { get; set; }
         public float ChangeRate { get; set; }
         public float Weight { get; private set; }
 
-        public Goal(string name, float weight)
+        public Goal(string name, float weight, int index)
         {
             this.Name = name;
             this.Weight = weight;
+            this.Index = index;
         }
 
         public override bool Equals(object obj)
