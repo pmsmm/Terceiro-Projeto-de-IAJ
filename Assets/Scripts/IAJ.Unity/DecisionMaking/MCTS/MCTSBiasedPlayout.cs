@@ -45,6 +45,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                     if (probabilitySum >= prob)
                     {
                         bestAction = possibleActions[i];
+                        chosenScore = (float)softmax[i];
                         break;
                     }
                 }
@@ -61,7 +62,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         float Heuristic(WorldModel state, GOB.Action action)
         {
             if (action.Name == "LevelUp") return 1f;
-            if (action.Name == "DivineWrath") return 1f;    //Precisamos de saber a Target de modo a usar isto de forma inteligente
+            if (action.Name == "DivineWrath") return 1f;
+            if (action.Name == "DivineSmite") return 0.8f;
 
             int money = (int)state.GetProperty(Properties.MONEY);
             int mana = (int)state.GetProperty(Properties.MANA);
