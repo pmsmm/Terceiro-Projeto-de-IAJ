@@ -50,6 +50,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 }
 
                 bestAction.ApplyActionEffects(newState);
+                newState.CalculateNextPlayer();
                 reward.Value = chosenScore;
                 reward.PlayerID = 0;
                 if (DEPTH_LIMIT > 0) numberOfIterations++;
