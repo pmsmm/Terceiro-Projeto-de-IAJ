@@ -63,7 +63,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
         {
             if (action.Name.Contains("LevelUp")) return 1f;
             if (action.Name.Contains("DivineWrath")) return 1f;
-            if (action.Name.Contains("DivineSmite")) return 0.8f;
+            if (action.Name.Contains("DivineSmite")) return 0.95f;
+            if (action.Name.Contains("ShieldOfFaith")) return 0.9f;
 
             int money = (int)state.GetProperty(Properties.MONEY);
             int mana = (int)state.GetProperty(Properties.MANA);
@@ -86,6 +87,19 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             if (manaScore < 0.5f)
             {
                 if (action.Name.Contains("GetManaPotion")) return 0.7f + 0.3f / (action.GetDuration() + 1f);
+            }
+
+            float duration = action.GetDuration();
+            if (duration < 2f)
+            {
+                if (action.Name.Contains("SwordAttack"))
+                {
+                    return 0.3f;
+                }
+                else
+                {
+                    return 0.8f;
+                }
             }
 
             return timeScore;
