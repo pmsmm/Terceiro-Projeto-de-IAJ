@@ -89,19 +89,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
                 if (action.Name.Contains("GetManaPotion")) return 0.7f + 0.3f / (action.GetDuration() + 1f);
             }
 
-            float duration = action.GetDuration();
-            if (duration < 2f)
-            {
-                if (action.Name.Contains("SwordAttack"))
-                {
-                    return 0.3f;
-                }
-                else
-                {
-                    return 0.8f;
-                }
-            }
-
             return timeScore;
         }
     }
