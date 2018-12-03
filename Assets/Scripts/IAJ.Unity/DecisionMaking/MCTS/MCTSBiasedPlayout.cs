@@ -9,8 +9,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class MCTSBiasedPlayout : MCTS
     {
-        //public int DEPTH_LIMIT = -1;
-        public int DEPTH_LIMIT = 20;
+        public int DEPTH_LIMIT = -1;
+        //public int DEPTH_LIMIT = 20;
 
         public MCTSBiasedPlayout(PropertyArrayWorldModel currentStateWorldModel) : base(currentStateWorldModel)
         {
@@ -87,12 +87,6 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             {
                 if (action.Name == "GetManaPotion") return 0.7f + 0.3f / action.GetDuration();
                 if (action.Name == "SwordAttack") return 0.65f;
-            }
-
-            if (hpScore > 0.6f && moneyScore >= 0.35f && moneyScore <= 0.65f)
-            {
-                if (action.Name == "PickUpChest") return 0.7f;
-                if (action.Name == "SwordAttack") return 0.6f;
             }
 
             if (moneyScore >= 0.95f) return 1.1f;
