@@ -9,8 +9,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class MCTSBiasedPlayout : MCTS
     {
-        public int DEPTH_LIMIT = -1;
-        //public int DEPTH_LIMIT = 20;
+        //public int DEPTH_LIMIT = -1;
+        public int DEPTH_LIMIT = 6;
 
         public MCTSBiasedPlayout(PropertyArrayWorldModel currentStateWorldModel) : base(currentStateWorldModel)
         {
@@ -21,7 +21,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             FutureStateWorldModel newState = new FutureStateWorldModel((FutureStateWorldModel)initialPlayoutState);
             Reward reward = new Reward();
             int numberOfIterations = 0;
-            while (!newState.IsTerminal() && (!(numberOfIterations >= DEPTH_LIMIT) || DEPTH_LIMIT <= 0))
+            while (!newState.IsTerminal() && (DEPTH_LIMIT <= 0 || !(numberOfIterations >= DEPTH_LIMIT)))
             {
                 GOB.Action[] possibleActions = newState.GetExecutableActions();
                 List<double> results = new List<double>();
@@ -62,9 +62,10 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
         float Heuristic(WorldModel state, GOB.Action action)
         {
-            if (action.Name == "LevelUp") return 1f;
-            if (action.Name == "DivineWrath") return 1f;
-            if (action.Name == "DivineSmite") return 0.8f;
+            if (action.Name.Contains("LevelUp")) return 1f;
+            if (action.Name.Contains("DivineWrath")) return 1f;
+            if (action.Name.Contains("DivineSmite")) return 0.95f;
+            if (action.Name.Contains("ShieldOfFaith")) return 0.9f;
 
             int money = (int)state.GetProperty(Properties.MONEY);
             int mana = (int)state.GetProperty(Properties.MANA);
@@ -79,18 +80,28 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 
             if (hpScore < 0.5f)
             {
-                if (action.Name == "LayOnHands") return 1f;
-                if (action.Name == "GetHealthPotion") return 0.7f + 0.3f / action.GetDuration();
-                if (action.Name == "SwordAttack") return 0.1f;
+                if (action.Name.Contains("LayOnHands")) return 1f;
+                if (action.Name.Contains("GetHealthPotion")) return 0.7f + 0.3f / (action.GetDuration() + 1f);
+                if (action.Name.Contains("SwordAttack")) return 0.01f;
             }
 
             if (manaScore < 0.5f)
             {
-                if (action.Name == "GetManaPotion") return 0.7f + 0.3f / action.GetDuration();
-                if (action.Name == "SwordAttack") return 0.65f;
+                if (action.Name.Contains("GetManaPotion")) return 0.7f + 0.3f / (action.GetDuration() + 1f);
             }
 
-            if (moneyScore >= 0.95f) return 1.1f;
+            float duration = action.GetDuration();
+            if (duration < 2f)
+            {
+                if (action.Name.Contains("SwordAttack"))
+                {
+                    return 0.3f;
+                }
+                else
+                {
+                    return 0.8f;
+                }
+            }
 
             return timeScore;
         }

@@ -42,15 +42,17 @@ namespace Assets.Scripts.GameManager
             int money = (int)this.GetProperty(Properties.MONEY);
             int HP = (int)this.GetProperty(Properties.HP);
             int MaxHP = (int)this.GetProperty(Properties.MAXHP);
+            int Mana = (int)this.GetProperty(Properties.MANA);
             float time = (float)GetProperty(Properties.TIME);
 
             //if (time - (float)Parent.GetProperty(Properties.TIME) < 1f) return 1f;
 
             float moneyScore = (float)money / 25f;
             float hpScore = (float)HP / (float)MaxHP;
+            float manaScore = (float)Mana / 10f;
             float timeScore = time / 200f;
 
-            Vector3 result = new Vector3(moneyScore * 0.05f, hpScore * 0.1f, timeScore * 1f);
+            Vector4 result = new Vector4(moneyScore * 0.5f, hpScore * 0.8f, manaScore * 0.6f, timeScore * 1f);
             return result.sqrMagnitude;
         }
 
