@@ -9,8 +9,8 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
 {
     public class MCTSBiasedPlayout : MCTS
     {
-        public int DEPTH_LIMIT = -1;
-        //public int DEPTH_LIMIT = 10;
+        //public int DEPTH_LIMIT = -1;
+        public int DEPTH_LIMIT = 6;
 
         public MCTSBiasedPlayout(PropertyArrayWorldModel currentStateWorldModel) : base(currentStateWorldModel)
         {
@@ -21,7 +21,7 @@ namespace Assets.Scripts.IAJ.Unity.DecisionMaking.MCTS
             FutureStateWorldModel newState = new FutureStateWorldModel((FutureStateWorldModel)initialPlayoutState);
             Reward reward = new Reward();
             int numberOfIterations = 0;
-            while (!newState.IsTerminal() && (!(numberOfIterations >= DEPTH_LIMIT) || DEPTH_LIMIT <= 0))
+            while (!newState.IsTerminal() && (DEPTH_LIMIT <= 0 || !(numberOfIterations >= DEPTH_LIMIT)))
             {
                 GOB.Action[] possibleActions = newState.GetExecutableActions();
                 List<double> results = new List<double>();
